@@ -1,0 +1,31 @@
+---
+apiVersion: kuadrant.io/v1beta2
+kind: AuthPolicy
+metadata:
+  name: toystore
+  namespace: toystore
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: toystore
+  rules:
+    authentication:
+      "api-key-authn":
+        apiKey:
+          selector: {}
+        credentials:
+          authorizationHeader:
+            prefix: APIKEY
+    authorization:
+      "only-admins":
+        opa:
+          rego: |
+            groups := split(object.get(input.auth.identity.metadata.annotations, "kuadrant.io/groups", ""), ",")
+            allow { groups[_] == "admins" }
+        routeSelectors:
+
+        - matches:
+          - path:
+              type: PathPrefix
+              value: "/admin"
