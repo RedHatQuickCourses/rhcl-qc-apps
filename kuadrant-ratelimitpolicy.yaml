@@ -9,11 +9,8 @@ spec:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: ${gatewayName}
-  defaults:
-    limits:
-      "low-limit":
-        rates:
-
-        - limit: 2
-          duration: 10
-          unit: second
+  limits:
+    "default-limits":
+      rates:
+      - limit: 2
+        window: 10s
